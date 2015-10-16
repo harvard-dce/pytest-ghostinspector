@@ -1,8 +1,8 @@
 pytest-ghostinspector
 ===================================
 
-.. image:: https://travis-ci.org/lbjay/pytest-ghostinspector.svg?branch=master
-    :target: https://travis-ci.org/lbjay/pytest-ghostinspector
+.. image:: https://travis-ci.org/harvard-dce/pytest-ghostinspector.svg?branch=master
+    :target: https://travis-ci.org/harvard-dce/pytest-ghostinspector
     :alt: See Build Status on Travis CI
 
 For discovering & executing Ghost Inspector tests

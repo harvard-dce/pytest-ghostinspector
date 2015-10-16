@@ -1,0 +1,6 @@
+site_name: pytest-ghostinspector
+site_description: For finding/executing Ghost Inspector tests
+
+theme: readthedocs
+
+repo_url: https://github.com/lbjay/pytest-ghostinspector

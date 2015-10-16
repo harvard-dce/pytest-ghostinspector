@@ -23,7 +23,7 @@ setup(
     description='For finding/executing Ghost Inspector tests',
     long_description=read('README.rst'),
     py_modules=['pytest_ghostinspector'],
-    install_requires=['pytest>=2.8.1'],
+    install_requires=['pytest>=2.8.1', 'requests'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

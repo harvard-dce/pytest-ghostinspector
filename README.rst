@@ -5,15 +5,7 @@ pytest-ghostinspector
     :target: https://travis-ci.org/lbjay/pytest-ghostinspector
     :alt: See Build Status on Travis CI
 
-.. image:: https://ci.appveyor.com/api/projects/status/github/lbjay/pytest-ghostinspector?branch=master
-    :target: https://ci.appveyor.com/project/lbjay/pytest-ghostinspector/branch/master
-    :alt: See Build Status on AppVeyor
-
-For finding/executing Ghost Inspector tests
-
-----
-
-This `Pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`_'s `Cookiecutter-pytest-plugin`_ template.
+For discovering & executing Ghost Inspector tests
 
 
 Features
@@ -68,3 +60,7 @@ If you encounter any problems, please `file an issue`_ along with a detailed des
 .. _`tox`: https://tox.readthedocs.org/en/latest/
 .. _`pip`: https://pypi.python.org/pypi/pip/
 .. _`PyPI`: https://pypi.python.org/pypi
+
+----
+
+This `Pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`_'s `Cookiecutter-pytest-plugin`_ template.

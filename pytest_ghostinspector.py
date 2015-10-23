@@ -31,7 +31,7 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     """Configuration hook to verify we got the necessary options"""
-    if config.option.gi_key is None:
+    if not config.option.help and config.option.gi_key is None:
         raise pytest.UsageError("Missing --gi_key option")
 
 def pytest_collect_file(path, parent):
@@ -122,9 +122,29 @@ class GITestItem(pytest.Item, GIAPIMixin):
     def runtest(self):
         url = GI_API_URL + 'tests/{}/execute/'.format(self.spec['id'])
         result = self._api_request(url, self.spec['params'])
-        assert result['passing']
+        if not result['passing']:
+            raise GIException(self, result)
 
-#    def repr_failure(self, excinfo):
-#        pass
+    def repr_failure(self, excinfo):
+        """ format failure info from GI API response """
+        if isinstance(excinfo.value, GIException):
+            resp_data = excinfo.value.args[1]
+            failing_step = next(step for step in resp_data['steps'] if not step['passing'])
+            return "\n".join([
+                "Ghost Inspector test failed",
+                "   name: %s" % resp_data['test']['name'],
+                "   result url: https://app.ghostinspector.com/results/%s" % resp_data['_id'],
+                "   step #: %d" % failing_step['sequence'],
+                "   target: %s" % failing_step['target'],
+                "   command: %s" % failing_step['command'],
+                "   value: %s" % failing_step['value'],
+                "   error: %s" % failing_step['error']
+            ])
 
 
+    def reportinfo(self):
+        return self.fspath, 0, "%s :: %s" % (self.spec['suite'], self.name)
+
+
+class GIException(Exception):
+    """ custom failure reporting """

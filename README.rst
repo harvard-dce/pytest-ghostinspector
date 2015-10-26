@@ -11,13 +11,20 @@ For discovering & executing Ghost Inspector tests
 Features
 --------
 
-* TODO
-
+pytest-ghostinspector is a plugin that leverages the pytest
+framework and test runner to execute Ghost Inspector tests
+via the REST API. Instead of standard test code, you create
+your functional web application tests via the Ghost Inspector
+UI and/or test recorder, then specify the suites or individual
+tests to execute using a YAML config file or command-line
+arguments. The API key and any necessary test variables are
+also specified either as command-line arguments or in a
+`pytest.ini` file.
 
 Requirements
 ------------
 
-* TODO
+* python >= 2.7
 
 
 Installation
@@ -64,3 +71,7 @@ If you encounter any problems, please `file an issue`_ along with a detailed des
 ----
 
 This `Pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`_'s `Cookiecutter-pytest-plugin`_ template.
+
+Copyright
+---------
+2015 President and Fellows of Harvard College

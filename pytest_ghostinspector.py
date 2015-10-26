@@ -2,10 +2,12 @@
 
 import yaml
 import pytest
+import shutil
 import requests
+import tempfile
+from contextlib import contextmanager
 
 GI_API_URL = 'https://api.ghostinspector.com/v1/'
-
 
 # Command-line Options
 
@@ -23,9 +25,29 @@ def pytest_addoption(parser):
         dest='gi_start_url',
         help='Override the starting url value for the Ghost Inspector tests'
     )
+    group.addoption(
+        '--gi_suite',
+        action='append',
+        dest='gi_suite',
+        default=[],
+        help='Id of a Ghost Inspector suite to execute'
+    )
+    group.addoption(
+        '--gi_test',
+        action='append',
+        dest='gi_test',
+        default=[],
+        help='Id of a Ghost Inspector test to execute'
+    )
+
+    group.addoption(
+        '--gi_param',
+        action='append',
+        dest='gi_param',
+        help='Querystring param (repeatable) to include in the API execute request'
+    )
 
     parser.addini('gi_key', 'Dummy pytest.ini setting')
-
 
 # Plugin hook impls
 
@@ -34,6 +56,43 @@ def pytest_configure(config):
     if not config.option.help and config.option.gi_key is None:
         raise pytest.UsageError("Missing --gi_key option")
 
+@pytest.hookimpl(hookwrapper=True)
+def pytest_collection(session):
+    """
+    Allow execution of suites/tests specified via cmdline opts. Creates temp
+    yaml files for the discover/collection process.
+    """
+
+    @contextmanager
+    def _make_tmp_dir():
+        tmpdir = tempfile.mkdtemp()
+        yield tmpdir
+        shutil.rmtree(tmpdir)
+
+    def _make_tmp_yaml(tmpdir, data):
+        tf = tempfile.NamedTemporaryFile('wb',
+                                         prefix='gi_test_',
+                                         suffix='.yml',
+                                         dir=tmpdir,
+                                         delete=False)
+        yaml.safe_dump(data, tf)
+        tf.close()
+        return tf.name
+
+    if not session.config.option.gi_suite and not session.config.option.gi_test:
+        yield
+    else:
+        with _make_tmp_dir() as tmpdir:
+            tmp_files = []
+            for id in session.config.option.gi_suite:
+                test_yaml = {'suites': [{'id': id}]}
+                tmp_files.append(_make_tmp_yaml(tmpdir, test_yaml))
+            for id in session.config.option.gi_test:
+                test_yaml = {'tests': [{'id': id}]}
+                tmp_files.append(_make_tmp_yaml(tmpdir, test_yaml))
+            session.config.args = tmp_files
+            yield
+
 def pytest_collect_file(path, parent):
     """Collection hook for ghost inspector tests
 
@@ -41,7 +100,7 @@ def pytest_collect_file(path, parent):
     http://ghostinspector.com tests via the API
     """
     if str(path.basename.startswith('gi_test_')) and path.ext == '.yml':
-        return GICollector(path, parent=parent)
+        return GIYamlCollector(path, parent=parent)
 
 class GIAPIMixin(object):
 
@@ -51,16 +110,20 @@ class GIAPIMixin(object):
         params['apiKey'] = self.gi_key
         if self.config.option.gi_start_url is not None:
             params['startUrl'] = self.config.option.gi_start_url
-        resp = requests.get(url, params=params)
-        resp.raise_for_status()
-        return resp.json()['data']
+        try:
+            resp = requests.get(url, params=params)
+            resp.raise_for_status()
+            return resp.json()['data']
+        except Exception, e:
+            raise self.CollectError(str(e))
 
+# Custom collector & test item impl
 
-class GICollector(pytest.File, GIAPIMixin):
+class GIYamlCollector(pytest.File, GIAPIMixin):
     """Collect and generate pytest test items based on yaml config"""
 
     def __init__(self, *args, **kwargs):
-        super(GICollector, self).__init__(*args, **kwargs)
+        super(GIYamlCollector, self).__init__(*args, **kwargs)
         self.gi_key = self.config.option.gi_key
         self.gi_param_options = []
 
@@ -134,13 +197,12 @@ class GITestItem(pytest.Item, GIAPIMixin):
                 "Ghost Inspector test failed",
                 "   name: %s" % resp_data['test']['name'],
                 "   result url: https://app.ghostinspector.com/results/%s" % resp_data['_id'],
-                "   step #: %d" % failing_step['sequence'],
+                "   sequence: %d" % failing_step['sequence'],
                 "   target: %s" % failing_step['target'],
                 "   command: %s" % failing_step['command'],
                 "   value: %s" % failing_step['value'],
                 "   error: %s" % failing_step['error']
             ])
-
 
     def reportinfo(self):
         return self.fspath, 0, "%s :: %s" % (self.spec['suite'], self.name)

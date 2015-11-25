@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
 import codecs
 from setuptools import setup
 
@@ -10,37 +11,27 @@ def read(fname):
     file_path = os.path.join(os.path.dirname(__file__), fname)
     return codecs.open(file_path, encoding='utf-8').read()
 
+version_file = read('pytest_gi/__init__.py')
+version = re.search(
+    r"^__version__ = ['\"]([^'\"]*)['\"]",
+    version_file,
+    re.M).group(1)
 
 setup(
     name='pytest-ghostinspector',
-    version='0.1.0',
+    version=version,
     author='Jay Luker',
-    author_email='lbjay@reallywow.com',
-    maintainer='Jay Luker',
-    maintainer_email='lbjay@reallywow.com',
+    author_email='jay_luker@harvard.edu',
     license='MIT',
-    url='https://github.com/lbjay/pytest-ghostinspector',
+    url='https://github.com/harvard-dce/pytest-ghostinspector',
     description='For finding/executing Ghost Inspector tests',
     long_description=read('README.rst'),
-    py_modules=['pytest_ghostinspector'],
+    py_modules=['pytest_gi.plugin'],
     install_requires=['pytest>=2.8.1', 'requests', 'pyyaml'],
-    classifiers=[
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Testing',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Operating System :: OS Independent',
-        'License :: OSI Approved :: MIT License',
-    ],
+    keywords=['pytest', 'py.test'],
     entry_points={
         'pytest11': [
-            'ghostinspector = pytest_ghostinspector',
+            'ghostinspector = pytest_gi.plugin',
         ],
     },
 )

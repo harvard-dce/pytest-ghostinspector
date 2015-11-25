@@ -50,18 +50,13 @@ def pytest_addoption(parser):
         '--gi_param',
         action='append',
         dest='gi_param',
+        default=[],
         help=(
             'Querystring param (repeatable) to include '
             'in the API execute request. Example: "--gi_param foo=bar"'
         )
     )
 
-# Plugin hook impls
-
-def pytest_configure(config):
-    """Configuration hook to verify we got the necessary options"""
-    if not config.option.help and config.option.gi_key is None:
-        raise pytest.UsageError("Missing --gi_key option")
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_collection(session):
@@ -101,6 +96,7 @@ def pytest_collection(session):
             session.config.args = tmp_files
             yield
 
+
 def pytest_collect_file(path, parent):
     """Collection hook for ghost inspector tests
 
@@ -108,7 +104,10 @@ def pytest_collect_file(path, parent):
     http://ghostinspector.com tests via the API
     """
     if str(path.basename.startswith('gi_test_')) and path.ext == '.yml':
+        if parent.config.option.gi_key is None:
+            raise pytest.UsageError("Missing --gi_key option")
         return GIYamlCollector(path, parent=parent)
+
 
 class GIAPIMixin(object):
 
@@ -125,7 +124,6 @@ class GIAPIMixin(object):
         except Exception, e:
             raise self.CollectError(str(e))
 
-# Custom collector & test item impl
 
 class GIYamlCollector(pytest.File, GIAPIMixin):
     """Collect and generate pytest test items based on yaml config"""
@@ -165,8 +163,8 @@ class GIYamlCollector(pytest.File, GIAPIMixin):
         }
         return GITestItem(test_config['name'], self, spec)
 
-class GITestItem(pytest.Item, GIAPIMixin):
 
+class GITestItem(pytest.Item, GIAPIMixin):
 
     def __init__(self, name, parent, spec):
         super(GITestItem, self).__init__(name, parent)

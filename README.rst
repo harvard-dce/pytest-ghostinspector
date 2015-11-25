@@ -38,7 +38,69 @@ You can install "pytest-ghostinspector" via `pip`_ from `PyPI`_::
 Usage
 -----
 
-* TODO
+This plugin adds several command-line arguments to py.test::
+
+    ghostinspector:
+      --gi_key=GI_KEY       Set the value for the Ghost Inspector API key
+      --gi_start_url=GI_START_URL
+                            Override the starting url value for the Ghost
+                            Inspector tests
+      --gi_suite=GI_SUITE   Id of a Ghost Inspector suite to execute
+      --gi_test=GI_TEST     Id of a Ghost Inspector test to execute
+      --gi_param=GI_PARAM   Querystring param (repeatable) to include in the API
+                            execute request. Example: "--gi_param foo=bar"
+
+
+------
+
+Once installed the simplest way to execute your Ghost Inspector tests is via
+command-line options to py.test::
+
+    $ py.test --gi_key=hjkl1234 --gi_test=asdf0987
+
+Output should look something like::
+
+    ============================== test session starts =============================
+    platform linux2 -- Python 2.7.10, pytest-2.8.3, py-1.4.30, pluggy-0.3.1
+    rootdir: /path/to/cwd, inifile:
+    plugins: ghostinspector-0.1.0
+    collected 1 items
+
+    . .
+
+    ============================ 1 passed in 26.34 seconds =========================
+
+
+------
+
+To avoid having to type common options, like `--gi_key`, include them in a
+`pytest.ini` file with `addopts`::
+
+    [pytest]
+    ...
+    addopts =
+        --gi_key=abcd1234
+        --gi_param foo=bar
+
+------
+
+If you have a large enough collections of tests or suites you can create a
+YAML test file containing the ids and the plugin will collect and
+execute them::
+
+    # gi_test_my_tests.yml
+
+    suites:
+      - id: abcd1234
+      - id: fdsa9876
+
+    tests:
+      - id: qwer4567
+
+Then point py.test at the YAML file::
+
+    $ py.test gi_tests/gi_test_my_tests.yml
+
 
 Contributing
 ------------

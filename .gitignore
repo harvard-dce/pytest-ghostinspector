@@ -22,3 +22,9 @@ venv
 # tox
 .eggs
 .tox
+
+# execution helper
+run.py
+
+# pytest cache
+.cache

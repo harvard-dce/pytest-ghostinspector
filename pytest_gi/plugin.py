@@ -103,7 +103,7 @@ def pytest_collect_file(path, parent):
     This looks for yaml files containing configuration info for executing
     http://ghostinspector.com tests via the API
     """
-    if str(path.basename.startswith('gi_test_')) and path.ext == '.yml':
+    if path.basename.startswith('gi_test_') and path.ext == '.yml':
         if parent.config.option.gi_key is None:
             raise pytest.UsageError("Missing --gi_key option")
         return GIYamlCollector(path, parent=parent)
@@ -120,7 +120,12 @@ class GIAPIMixin(object):
         try:
             resp = requests.get(url, params=params)
             resp.raise_for_status()
-            return resp.json()['data']
+            resp_data = resp.json()
+            if 'errorType' in resp_data:
+                raise self.CollectError(
+                    "Ghost Inspector API returned error: %s" %
+                    resp_data['message'])
+            return resp_data['data']
         except Exception, e:
             raise self.CollectError(str(e))
 

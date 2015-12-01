@@ -27,7 +27,7 @@ setup(
     description='For finding/executing Ghost Inspector tests',
     long_description=read('README.rst'),
     py_modules=['pytest_gi.plugin'],
-    install_requires=['pytest>=2.8.1', 'requests', 'pyyaml'],
+    install_requires=['pytest>=2.8.1', 'requests>=2.7', 'pyyaml'],
     keywords=['pytest', 'py.test'],
     entry_points={
         'pytest11': [

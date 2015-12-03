@@ -1,19 +1,15 @@
-pytest-ghostinspector
-===================================
+# pytest-ghostinspector
 
-.. image:: https://travis-ci.org/harvard-dce/pytest-ghostinspector.svg?branch=master
-    :target: https://travis-ci.org/harvard-dce/pytest-ghostinspector
-    :alt: See Build Status on Travis CI
+[![Build Status](https://travis-ci.org/harvard-dce/pytest-ghostinspector.svg?branch=master)](https://travis-ci.org/harvard-dce/pytest-ghostinspector)
 
-For discovering & executing Ghost Inspector tests
+For discovering & executing [Ghost Inspector](https://ghostinspector.com/) tests.
 
 
-Features
---------
+## Features
 
 pytest-ghostinspector is a plugin that leverages the pytest
 framework and test runner to execute Ghost Inspector tests
-via the REST API. Instead of standard test code, you create
+via their REST API. Instead of standard test code, you create
 your functional web application tests via the Ghost Inspector
 UI and/or test recorder, then specify the suites or individual
 tests to execute using a YAML config file or command-line
@@ -21,22 +17,20 @@ arguments. The API key and any necessary test variables are
 also specified either as command-line arguments or in a
 `pytest.ini` file.
 
-Requirements
-------------
+## Requirements
 
-* python >= 2.7
+* works for python 2.6 - 3.5
+* A Ghost Inspector account & api key
 
 
-Installation
-------------
+## Installation
 
 The usual...
 
     $ pip install pytest-ghostinspector
 
 
-Usage
------
+## Usage
 
 This plugin adds several command-line arguments to py.test::
 
@@ -51,7 +45,7 @@ This plugin adds several command-line arguments to py.test::
                             execute request. Example: "--gi_param foo=bar"
 
 
-------
+### via command line options
 
 Once installed the simplest way to execute your Ghost Inspector tests is via
 command-line options to py.test::
@@ -71,18 +65,7 @@ Output should look something like::
     ============================ 1 passed in 26.34 seconds =========================
 
 
-------
-
-To avoid having to type common options, like `--gi_key`, include them in a
-`pytest.ini` file with `addopts`::
-
-    [pytest]
-    ...
-    addopts =
-        --gi_key=abcd1234
-        --gi_param foo=bar
-
-------
+### via YAML test files
 
 If you have a large enough collections of tests or suites you can create a
 YAML test file containing the ids and the plugin will collect and
@@ -102,26 +85,31 @@ Then point py.test at the YAML file::
     $ py.test gi_tests/gi_test_my_tests.yml
 
 
-Contributing
-------------
-Contributions are very welcome. Tests can be run with `tox`_.
+### pytest.ini 
 
-License
--------
+To avoid having to type common options, like `--gi_key`, include them in a
+`pytest.ini` file with `addopts`::
 
-Distributed under the terms of the `MIT`_ license, "pytest-ghostinspector" is free and open source software.
+    [pytest]
+    ...
+    addopts =
+        --gi_key=abcd1234
+        --gi_param foo=bar
 
+## Development
 
-Issues
-------
+Contributions are very welcome. Tests can be run with `tox`.
 
-If you encounter any problems, please `file an issue`_ along with a detailed description.
+## License
 
+Distributed under the terms of the MIT license, `pytest-ghostinspector` is free and open source software.
 
-----
+## Copyright
 
-This `Pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`_'s `Cookiecutter-pytest-plugin`_ template.
-
-Copyright
----------
 2015 President and Fellows of Harvard College
+
+## Hat-tips
+
+This plugin was generated with [Cookiecutter](https://github.com/audreyr/cookiecutter) 
+along with @hackebrot's [Cookiecutter-pytest-plugin](https://github.com/pytest-dev/cookiecutter-pytest-plugin) template.
+

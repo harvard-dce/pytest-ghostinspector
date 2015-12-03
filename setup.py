@@ -25,7 +25,7 @@ setup(
     license='MIT',
     url='https://github.com/harvard-dce/pytest-ghostinspector',
     description='For finding/executing Ghost Inspector tests',
-    long_description=read('README.rst'),
+    long_description=read('README.md'),
     py_modules=['pytest_gi.plugin'],
     install_requires=['pytest>=2.8.1', 'requests>=2.7', 'pyyaml'],
     classifiers=[

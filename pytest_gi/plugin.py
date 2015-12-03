@@ -148,13 +148,13 @@ class GIYamlCollector(pytest.File, GIAPIMixin):
             yield self._collect_test(test)
 
     def _collect_suite(self, suite):
-        url = API_URL + 'suites/{}/tests/'.format(suite['id'])
+        url = API_URL + ('suites/%s/tests/' % suite['id'])
         test_list = self._api_request(url)
         for test_config in test_list:
             yield self._create_test_item(test_config)
 
     def _collect_test(self, test):
-        url = API_URL + 'tests/{}/'.format(test['id'])
+        url = API_URL + ('tests/%s/' % test['id'])
         test_config = self._api_request(url)
         return self._create_test_item(test_config)
 
@@ -177,7 +177,7 @@ class GITestItem(pytest.Item, GIAPIMixin):
         self.spec = spec
 
     def runtest(self):
-        url = API_URL + 'tests/{}/execute/'.format(self.spec['id'])
+        url = API_URL + ('tests/%s/execute/' % self.spec['id'])
         result = self._api_request(url, self.spec['params'])
         if not result['passing']:
             raise GIException(self, result)

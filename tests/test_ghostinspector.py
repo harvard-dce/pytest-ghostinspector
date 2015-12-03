@@ -130,8 +130,8 @@ def test_cmdline_collect_suite(testdir, gi_api_suite_tests_re):
 
     result.stdout.fnmatch_lines([
         u'collected 2 items',
-        u"  <GITestItem u'test 1'>",
-        u"  <GITestItem u'test 2'>",
+        u"*GITestItem*'test 1'*",
+        u"*GITestItem*'test 2'*",
     ])
 
 @pytest.mark.httpretty
@@ -151,7 +151,7 @@ def test_cmdline_collect_test(testdir, gi_api_test_re):
 
     result.stdout.fnmatch_lines([
         u'collected 1 items',
-        u"  <GITestItem u'test xyz789'>",
+        u"*GITestItem*'test xyz789'*",
     ])
 
 @pytest.mark.httpretty

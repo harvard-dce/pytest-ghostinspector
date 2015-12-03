@@ -72,7 +72,7 @@ def pytest_collection(session):
         shutil.rmtree(tmpdir)
 
     def _make_tmp_yaml(tmpdir, data):
-        tf = tempfile.NamedTemporaryFile('wb',
+        tf = tempfile.NamedTemporaryFile('wt',
                                          prefix='gi_test_',
                                          suffix='.yml',
                                          dir=tmpdir,
@@ -126,7 +126,7 @@ class GIAPIMixin(object):
                     "Ghost Inspector API returned error: %s" %
                     resp_data['message'])
             return resp_data['data']
-        except Exception, e:
+        except Exception as e:
             raise self.CollectError(str(e))
 
 

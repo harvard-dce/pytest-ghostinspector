@@ -93,7 +93,7 @@ def pytest_collection(session):
             for id in session.config.option.gi_test:
                 test_yaml = {'tests': [{'id': id}]}
                 tmp_files.append(_make_tmp_yaml(tmpdir, test_yaml))
-            session.config.args = tmp_files
+            session.config.args += tmp_files
             yield
 
 

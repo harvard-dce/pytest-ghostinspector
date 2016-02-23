@@ -3,25 +3,6 @@
 import pytest
 from pytest_httpretty import stub_get
 
-SUITE_RESP = '''
-{
-    "data": [
-        { "_id": 1, "name": "test 1", "suite": { "name": "ABC Suite" } },
-        { "_id": 2, "name": "test 2", "suite": { "name": "ABC Suite" } }
-    ]
-}
-'''
-
-TEST_RESP = '''
-{
-    "data": {
-        "_id": "xyz789",
-        "name": "test xyz789",
-        "suite": { "name": "ABC Suite" }
-    }
-}
-'''
-
 def test_help_message(testdir):
 
     result = testdir.runpytest(
@@ -114,11 +95,11 @@ def test_cmdline_404_suite(testdir, gi_api_suite_tests_re):
     ])
 
 @pytest.mark.httpretty
-def test_cmdline_collect_suite(testdir, gi_api_suite_tests_re):
+def test_cmdline_collect_suite(testdir, suite_resp, gi_api_suite_tests_re):
 
     stub_get(
         gi_api_suite_tests_re,
-        body=SUITE_RESP,
+        body=suite_resp,
         content_type="application/json"
     )
 
@@ -135,11 +116,11 @@ def test_cmdline_collect_suite(testdir, gi_api_suite_tests_re):
     ])
 
 @pytest.mark.httpretty
-def test_cmdline_collect_test(testdir, gi_api_test_re):
+def test_cmdline_collect_test(testdir, test_resp, gi_api_test_re):
 
     stub_get(
         gi_api_test_re,
-        body=TEST_RESP,
+        body=test_resp,
         content_type="application/json"
     )
 
@@ -155,7 +136,7 @@ def test_cmdline_collect_test(testdir, gi_api_test_re):
     ])
 
 @pytest.mark.httpretty
-def test_cmdline_exec_test(testdir, gi_api_test_re, gi_api_test_exec_re):
+def test_cmdline_exec_test(testdir, test_resp, gi_api_test_re, gi_api_test_exec_re):
 
     def req_callback(request, uri, headers):
         return (
@@ -167,7 +148,7 @@ def test_cmdline_exec_test(testdir, gi_api_test_re, gi_api_test_exec_re):
     stub_get(
         gi_api_test_re,
         content_type="application/json",
-        body=TEST_RESP
+        body=test_resp
     )
     stub_get(
         gi_api_test_exec_re,

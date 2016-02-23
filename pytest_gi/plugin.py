@@ -189,7 +189,7 @@ class GITestItem(pytest.Item, GIAPIMixin):
             failing_step = next(
                 step for step in resp_data['steps'] if not step['passing']
             )
-            result_url_base = 'https://app.ghostinspector.com/results/'
+            result_url_base = 'https://app.ghostinspector.com/results'
             return "\n".join([
                 "Ghost Inspector test failed",
                 "   name: %s" % resp_data['test']['name'],

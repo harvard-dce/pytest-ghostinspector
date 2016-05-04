@@ -189,16 +189,25 @@ class GITestItem(pytest.Item, GIAPIMixin):
             failing_step = next(
                 step for step in resp_data['steps'] if not step['passing']
             )
+
+            if 'error' in resp_data:
+                error_msg = resp_data['error']['details']
+            else:
+                error_msg = ''
+
             result_url_base = 'https://app.ghostinspector.com/results'
             return "\n".join([
                 "Ghost Inspector test failed",
                 "   name: %s" % resp_data['test']['name'],
+                "   start url: %s" % resp_data['startUrl'],
+                "   end url: %s" % resp_data['endUrl'],
                 "   result url: %s/%s" % (result_url_base, resp_data['_id']),
                 "   sequence: %d" % failing_step['sequence'],
                 "   target: %s" % failing_step['target'],
                 "   command: %s" % failing_step['command'],
                 "   value: %s" % failing_step['value'],
-                "   error: %s" % failing_step['error']
+                "   error: %s" % error_msg,
+                "   step error: %s" % failing_step.get('error', '')
             ])
 
     def reportinfo(self):

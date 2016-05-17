@@ -165,3 +165,76 @@ def test_cmdline_exec_test(testdir, test_resp, gi_api_test_re, gi_api_test_exec_
         u'collected 1 items',
         u"*1 passed*",
     ])
+
+def test_collect_mode_files(testdir):
+    testdir.makepyfile('def test_fail(): assert 0')
+
+    # this should result in a GI API error that the gi test was not found;
+    # meant to confirm that the --gi_test option is triggering an attempt to
+    # collect via the GI API
+    result = testdir.runpytest(
+        '--collect-only',
+        '--gi_key=foo',
+        '--gi_test=xyz789'
+    )
+    result.stdout.fnmatch_lines([
+        '*Test not found*'
+    ])
+
+    # this will pass because collect mode "files" skips collection via
+    # the GI API
+    result = testdir.runpytest(
+        '--collect-only',
+        '--gi_key=foo',
+        '--gi_test=xyz789',
+        '--gi_collect_mode=files'
+    )
+    result.stdout.fnmatch_lines([
+        'collected 1 items',
+        '*test_fail*'
+    ])
+
+@pytest.mark.httpretty
+def test_collect_mode_all(testdir, test_resp, gi_api_test_re):
+    testdir.makepyfile('def test_fail(): assert 0')
+
+    stub_get(
+        gi_api_test_re,
+        body=test_resp,
+        content_type="application/json"
+    )
+
+    result = testdir.runpytest(
+        '--collect-only',
+        '--gi_key=foo',
+        '--gi_test=xyz789',
+        '--gi_collect_mode=all'
+    )
+
+    result.stdout.fnmatch_lines([
+        u'collected 2 items',
+        u"*test_fail*",
+        u"*GITestItem*'test xyz789'*"
+    ])
+
+@pytest.mark.httpretty
+def test_collect_mode_ids(testdir, test_resp, gi_api_test_re):
+    testdir.makepyfile('def test_fail(): assert 0')
+
+    stub_get(
+        gi_api_test_re,
+        body=test_resp,
+        content_type="application/json"
+    )
+
+    # use of --gi_test/--gi_suite opts auto triggers "ids" collect mode
+    result = testdir.runpytest(
+        '--collect-only',
+        '--gi_key=foo',
+        '--gi_test=xyz789',
+    )
+
+    result.stdout.fnmatch_lines([
+        u'collected 1 items',
+        u"*GITestItem*'test xyz789'*"
+    ])

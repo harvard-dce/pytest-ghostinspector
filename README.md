@@ -95,6 +95,20 @@ To avoid having to type common options, like `--gi_key`, include them in a
     addopts =
         --gi_key=abcd1234
         --gi_param foo=bar
+        
+### Collection modes
+
+v0.4.0 introduced the `--gi_collect_mode` option for controlling how the plugin
+deals with test collection. The options are:
+
+* "all" - specify GI tests via `--gi-test`/`--gi-suite` options, plus standard file system test discovery enabled
+* "files" - disables GI API collection via `--gi-test`/`--gi-suite`
+* "ids" - disables file system test discovery; only collect tests identified via `--gi-test`/`--gi-suite` 
+
+The `ids` mode can be useful in situations where you only wish to use the plugin
+to execute a known set of tests and/or suites, and skip any tests that might be found by searching `cwd`.
+
+By default, if no mode is explicitly passed the inclusion of `--gi-test`/`--gi-suite` will trigger `ids` mode. 
 
 ## Development
 

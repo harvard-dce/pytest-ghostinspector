@@ -57,6 +57,23 @@ def pytest_addoption(parser):
         )
     )
 
+    group.addoption(
+        '--gi_collect_mode',
+        action='store',
+        dest='gi_collect_mode',
+        type=str,
+        choices=['files', 'ids', 'all'],
+        help=('specifiy "files", "ids" or "all" to control how the plugin '
+              'manages test collection')
+    )
+
+def pytest_configure(config):
+    # only do logic if mode is not explicitly set
+    if config.option.gi_collect_mode is None:
+        if config.option.gi_test or config.option.gi_suite:
+            # this will disable file/directory test discovery
+            config.option.gi_collect_mode = "ids"
+
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_collection(session):
@@ -84,6 +101,8 @@ def pytest_collection(session):
     if not session.config.option.gi_suite \
             and not session.config.option.gi_test:
         yield
+    elif session.config.option.gi_collect_mode == "files":
+        yield
     else:
         with _make_tmp_dir() as tmpdir:
             tmp_files = []
@@ -107,6 +126,15 @@ def pytest_collect_file(path, parent):
         if parent.config.option.gi_key is None:
             raise pytest.UsageError("Missing --gi_key option")
         return GIYamlCollector(path, parent=parent)
+
+
+def pytest_ignore_collect(path, config):
+    """
+    Disable file/directory collection when --gi-test/--gi-suite options are
+    provided
+    """
+    if config.option.gi_collect_mode == "ids":
+        return True
 
 
 class GIAPIMixin(object):
